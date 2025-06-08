@@ -1,18 +1,35 @@
 package main
 
 import (
-    "log"
-    "github.com/gofiber/fiber/v2"
+	"log"
+	"os"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-    app := fiber.New()
+	err := godotenv.Load()
 
-    // Serve files from the "videos" directory
-    app.Static("/videos", "./videos")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+		return
+	}
 
-    log.Println("Starting API on :3000")
-    if err := app.Listen(":3000"); err != nil {
-        log.Fatal(err)
-    }
+	app := fiber.New()
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+	}))
+
+	port := os.Getenv("PORT")
+
+	app.Static("/videos", port)
+
+	log.Printf("Starting API on %s\n", port)
+
+	if err := app.Listen(":" + port); err != nil {
+		log.Fatal(err)
+	}
 }
