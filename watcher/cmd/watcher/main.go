@@ -10,7 +10,12 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	err:= godotenv.Load("./.env")
+
+	if err != nil {
+		panic("Error loading .env file")
+	}
+
 	producer := producer.Producer{
 		Sender: &kafka_sender.KafkaSender{},
 	}

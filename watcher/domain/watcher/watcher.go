@@ -22,6 +22,7 @@ func (w *Watcher) Start(producer *producer.Producer) error {
 	done := make(chan struct{})
 
 	go func() {
+		log.Println("Starting file watcher on:", w.FolderPath)
 		for {
 			select {
 			case event, ok := <-watcher.Events:
