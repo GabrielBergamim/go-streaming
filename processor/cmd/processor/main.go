@@ -73,7 +73,7 @@ func processVideos(folder, outDir string) {
 			log.Println("processing video file:", f)
 			out := filepath.Join(outDir, "video")
 			log.Println("output file will be:", out+".m3u8")
-			log.Println("segment filename will be:", fmt.Sprintf("%segment_%%03d.ts", out))
+			log.Println("segment filename will be:", fmt.Sprintf("%s/segment_%%03d.ts", out))
 			cmd := exec.Command("ffmpeg",
 				"-i", f,
 				"-preset", "slow",
@@ -81,7 +81,7 @@ func processVideos(folder, outDir string) {
 				"-crf", "18",
 				"-hls_time", "10",
 				"-hls_list_size", "0",
-				"-hls_segment_filename", fmt.Sprintf("%segment_%%03d.ts", out),
+				"-hls_segment_filename", fmt.Sprintf("%s/segment_%%03d.ts", out),
 				out+".m3u8")
 
 			if err := cmd.Run(); err != nil {
