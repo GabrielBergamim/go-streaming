@@ -4,7 +4,7 @@ WORKDIR /app
 COPY go.mod .
 RUN go mod download
 COPY . .
-RUN go build -o processor ./cmd/processor
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o processor ./cmd/processor
 
 # Final stage
 FROM alpine:latest

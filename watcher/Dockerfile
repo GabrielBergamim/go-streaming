@@ -5,7 +5,7 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 COPY . .
-RUN go build -o watcher ./cmd/watcher
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o watcher ./cmd/watcher
 
 # Final stage
 FROM gcr.io/distroless/base-debian12
