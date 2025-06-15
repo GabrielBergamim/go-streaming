@@ -23,10 +23,9 @@ func main() {
 		AllowOrigins: "*",
 	}))
 
+	app.Static("/videos", "./public/videos")
+
 	port := os.Getenv("PORT")
-
-	app.Static("/videos", port)
-
 	log.Printf("Starting API on %s\n", port)
 
 	if err := app.Listen(":" + port); err != nil {
