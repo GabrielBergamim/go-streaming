@@ -14,11 +14,48 @@ services:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false  # We want to create topics manually
       - ALLOW_PLAINTEXT_LISTENER=yes
     ports:
       - "9092:9092"
     depends_on:
       - zookeeper
+
+  watcher:
+    build: ./watcher
+    container_name: watcher
+    env_file:
+      - ./watcher/.env
+    volumes:
+      - watch-volume:/watch
+    depends_on:
+      - kafka
+
+  processor:
+    build: ./processor
+    container_name: processor
+    env_file:
+      - ./processor/.env
+    volumes:
+      - watch-volume:/watch
+      - processed-volume:/processed
+    depends_on:
+      - kafka
+
+  api:
+    build: ./api
+    container_name: api
+    env_file:
+      - ./api/.env
+    volumes:
+      - processed-volume:/app/public/videos
+    ports:
+      - "8080:8080"
+    depends_on:
+      - processor
+
+volumes:
+  watch-volume:
+  processed-volume:
 
