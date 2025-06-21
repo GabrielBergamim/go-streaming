@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/example/go-streaming/watcher/domain/producer"
@@ -10,10 +11,10 @@ import (
 )
 
 func main() {
-	err:= godotenv.Load("./.env")
+	err := godotenv.Load()
 
 	if err != nil {
-		panic("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
 
 	producer := producer.Producer{
