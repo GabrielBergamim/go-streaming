@@ -28,7 +28,7 @@ services:
     env_file:
       - ./watcher/.env
     volumes:
-      - watch-volume:/watch
+      - /home/gabrielbergamim/videos:/watch
     depends_on:
       - kafka
 
@@ -38,8 +38,8 @@ services:
     env_file:
       - ./processor/.env
     volumes:
-      - watch-volume:/watch
-      - processed-volume:/processed
+      - /home/gabrielbergamim/videos:/watch
+      - /home/gabrielbergamim/videos/output:/processed
     depends_on:
       - kafka
 
@@ -49,13 +49,8 @@ services:
     env_file:
       - ./api/.env
     volumes:
-      - processed-volume:/app/public/videos
+      - /home/gabrielbergamim/videos/output:/app/public/videos
     ports:
-      - "8080:8080"
+      - "3000:3000"
     depends_on:
       - processor
-
-volumes:
-  watch-volume:
-  processed-volume:
-
