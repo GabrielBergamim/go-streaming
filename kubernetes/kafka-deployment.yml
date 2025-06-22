@@ -31,3 +31,12 @@ spec:
               value: "false"
             - name: ALLOW_PLAINTEXT_LISTENER
               value: "yes"
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /bitnami/kafka
+          securityContext:
+            runAsUser: 0
+      volumes:
+        - name: kafka-data
+          persistentVolumeClaim:
+            claimName: pvc-kafka

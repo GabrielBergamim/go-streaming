@@ -5,4 +5,6 @@ metadata:
   namespace: video-streaming
 data:
   WATCH_DIR: /watch
+  KAFKA_TOPIC: process-topic
+  KAFKA_BROKER: kafka:9092
 
