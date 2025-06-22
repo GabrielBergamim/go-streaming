@@ -14,7 +14,7 @@ services:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false  # We want to create topics manually
       - ALLOW_PLAINTEXT_LISTENER=yes
     ports:
@@ -22,3 +22,35 @@ services:
     depends_on:
       - zookeeper
 
+  watcher:
+    build: ./watcher
+    container_name: watcher
+    env_file:
+      - ./watcher/.env
+    volumes:
+      - /home/gabrielbergamim/videos:/watch
+    depends_on:
+      - kafka
+
+  processor:
+    build: ./processor
+    container_name: processor
+    env_file:
+      - ./processor/.env
+    volumes:
+      - /home/gabrielbergamim/videos:/watch
+      - /home/gabrielbergamim/videos/output:/processed
+    depends_on:
+      - kafka
+
+  api:
+    build: ./api
+    container_name: api
+    env_file:
+      - ./api/.env
+    volumes:
+      - /home/gabrielbergamim/videos/output:/app/public/videos
+    ports:
+      - "3000:3000"
+    depends_on:
+      - processor

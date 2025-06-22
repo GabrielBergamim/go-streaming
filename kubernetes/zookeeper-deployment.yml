@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+  namespace: video-streaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: bitnami/zookeeper:3.8
+          securityContext:
+              runAsUser: 0
+              runAsGroup: 0
+          ports:
+            - containerPort: 2181
+          env:
+            - name: ALLOW_ANONYMOUS_LOGIN
+              value: "yes"
+          ports:
+            - containerPort: 9092
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /bitnami/zookeeper
+      volumes:
+        - name: kafka-data
+          persistentVolumeClaim:
+            claimName: pvc-zookeeper
