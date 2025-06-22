@@ -4,9 +4,10 @@ metadata:
   name: pv-videos
 spec:
   capacity:
-    storage: 1Gi
+    storage: 50Gi
   accessModes:
     - ReadWriteMany
+  storageClassName: ""
   hostPath:
-    path: /home/gabrielbergamim/videos
+    path: /mnt/videos
 
