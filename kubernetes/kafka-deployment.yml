@@ -21,6 +21,9 @@ spec:
         - name: fix-permissions
           image: busybox:latest
           command: ["sh","-c","chown -R 1001:1001 /bitnami/kafka"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
           volumeMounts:
             - name: kafka-data
               mountPath: /bitnami/kafka
