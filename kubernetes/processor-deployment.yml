@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: processor
+  namespace: video-streaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: processor
+  template:
+    metadata:
+      labels:
+        app: processor
+    spec:
+      containers:
+        - name: processor
+          image: docker.io/library/go-streaming-processor:latest
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: processor-env
+          volumeMounts:
+            - name: videos-volume
+              mountPath: /watch
+            - name: videos-processed
+              mountPath: /processed
+      volumes:
+        - name: videos-volume
+          persistentVolumeClaim:
+            claimName: pvc-videos
+        - name: videos-processed
+          persistentVolumeClaim:
+            claimName: pvc-videos-processed

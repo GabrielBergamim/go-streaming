@@ -7,7 +7,23 @@ spec:
     storage: 50Gi
   accessModes:
     - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
   hostPath:
     path: /mnt/videos
 
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-videos-processed
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: /mnt/videos-processed
