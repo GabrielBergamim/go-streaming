@@ -4,7 +4,7 @@ metadata:
   name: pvc-videos
   namespace: video-streaming
 spec:
-  volume: pv-videos
+  volumeName: pv-videos
   accessModes:
     - ReadWriteMany
   resources:
@@ -20,7 +20,7 @@ metadata:
   name: pvc-videos-processed
   namespace: video-streaming
 spec:
-  volume: pv-videos-processed
+  volumeName: pv-videos-processed
   accessModes:
     - ReadWriteMany
   resources:
