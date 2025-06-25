@@ -11,32 +11,3 @@ spec:
   hostPath:
     path: /mnt/videos
 
----
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-kafka
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: standard
-  hostPath:
-    path: /mnt/kafka
-
----
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-zookeeper
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: standard
-  hostPath:
-    path: /mnt/zookeeper

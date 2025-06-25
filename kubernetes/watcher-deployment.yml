@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: watcher
-
   namespace: video-streaming
 spec:
   replicas: 1

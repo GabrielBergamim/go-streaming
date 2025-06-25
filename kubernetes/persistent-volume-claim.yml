@@ -11,32 +11,3 @@ spec:
       storage: 50Gi
   storageClassName: ""
 
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-kafka
-  namespace: video-streaming
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: standard
-
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-zookeeper
-  namespace: video-streaming
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: standard
