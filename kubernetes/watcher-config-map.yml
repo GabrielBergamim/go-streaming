@@ -6,5 +6,5 @@ metadata:
 data:
   WATCH_DIR: /watch
   KAFKA_TOPIC: process-topic
-  KAFKA_BROKER: kafka:9092
+  KAFKA_BROKER: my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
 
