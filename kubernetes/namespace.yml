@@ -3,3 +3,9 @@ kind: Namespace
 metadata:
   name: video-streaming
 
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kafka

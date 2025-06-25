@@ -1,30 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: watcher
+  name: processor
   namespace: video-streaming
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: watcher
+      app: processor
   template:
     metadata:
       labels:
-        app: watcher
+        app: processor
     spec:
       containers:
-        - name: watcher
-          image: docker.io/library/go-streaming-watcher:latest
+        - name: processor
+          image: docker.io/library/go-streaming-processor:latest
           imagePullPolicy: Never
           envFrom:
             - configMapRef:
-                name: watcher-env
+                name: processor-env
           volumeMounts:
             - name: videos-volume
               mountPath: /watch
+            - name: videos-processed
+              mountPath: /processed
       volumes:
         - name: videos-volume
           persistentVolumeClaim:
             claimName: pvc-videos
-
+        - name: videos-processed
+          persistentVolumeClaim:
+            claimName: pvc-videos-processed

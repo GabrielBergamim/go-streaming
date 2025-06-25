@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: watcher-env
+  name: processor-env
   namespace: video-streaming
 data:
-  WATCH_DIR: /watch
+  OUTPUT_DIR: /processed
   KAFKA_TOPIC: process-topic
   KAFKA_BROKER: my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
 

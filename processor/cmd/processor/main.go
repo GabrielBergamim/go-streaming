@@ -29,7 +29,7 @@ func main() {
 	}
 
 	kafkaTopic := os.Getenv("KAFKA_TOPIC")
-	kafkaURL := os.Getenv("KAFKA_URL")
+	kafkaURL := os.Getenv("KAFKA_BROKER")
 	outDir := os.Getenv("OUTPUT_DIR")
 
 	r := kafka.NewReader(kafka.ReaderConfig{

@@ -7,6 +7,7 @@ spec:
     storage: 50Gi
   accessModes:
     - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
   hostPath:
     path: /mnt/videos
@@ -16,27 +17,13 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-kafka
+  name: pv-videos-processed
 spec:
   capacity:
-    storage: 1Gi
+    storage: 50Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: standard
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
   hostPath:
-    path: /mnt/kafka
-
----
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-zookeeper
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: standard
-  hostPath:
-    path: /mnt/zookeeper
+    path: /mnt/videos-processed

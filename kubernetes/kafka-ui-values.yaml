@@ -1,0 +1,4 @@
+envs:
+  config:
+    KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: my-cluster-kafka-bootstrap:9092
+    KAFKA_CLUSTERS_0_NAME: my-cluster
