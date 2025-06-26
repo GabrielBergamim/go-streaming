@@ -8,7 +8,7 @@ COPY . .
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o api ./cmd/api
 
 # Final stage
-FROM gcr.io/distroless/base-debian12
+FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/api ./api
 COPY --from=builder /app/public ./public
