@@ -5,6 +5,11 @@ go 1.24
 require github.com/gofiber/fiber/v2 v2.49.2
 
 require (
+        gorm.io/driver/postgres v1.5.0
+        gorm.io/gorm v1.25.0
+)
+
+require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/joho/godotenv v1.5.1
