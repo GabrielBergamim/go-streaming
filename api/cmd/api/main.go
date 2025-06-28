@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -45,7 +46,7 @@ func main() {
 
 		query := db.Model(&Video{})
 		if name != "" {
-			query = query.Where("file_name = ?", name)
+			query = query.Where("file_name ILIKE ?", fmt.Sprintf("%%%s%%", name))
 		}
 		if err := query.Find(&videos).Error; err != nil {
 			return err
