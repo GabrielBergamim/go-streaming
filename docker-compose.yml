@@ -22,11 +22,24 @@ services:
     depends_on:
       - zookeeper
 
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: video-streaming
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   watcher:
     build: ./watcher
     container_name: watcher
     env_file:
-      - ./watcher/.env
+      - ./.env
     volumes:
       - /home/gabrielbergamim/videos:/watch
     depends_on:
@@ -36,7 +49,7 @@ services:
     build: ./processor
     container_name: processor
     env_file:
-      - ./processor/.env
+      - ./.env
     volumes:
       - /home/gabrielbergamim/videos:/watch
       - /home/gabrielbergamim/videos/output:/processed
@@ -47,10 +60,13 @@ services:
     build: ./api
     container_name: api
     env_file:
-      - ./api/.env
+      - ./.env
     volumes:
       - /home/gabrielbergamim/videos/output:/app/public/videos
     ports:
       - "3000:3000"
     depends_on:
       - processor
+
+volumes:
+  postgres_data:
