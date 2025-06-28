@@ -11,6 +11,8 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/segmentio/kafka-go"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type MessageEvent struct {
@@ -19,6 +21,14 @@ type MessageEvent struct {
 	FileName string `json:"fileName"`
 	Size     int64  `json:"size"`
 	Path     string `json:"path"`
+}
+
+type Video struct {
+	ID       string `json:"id" gorm:"column:id;primaryKey"`
+	Event    string `json:"event" gorm:"column:event"`
+	FileName string `json:"fileName" gorm:"column:file_name"`
+	Size     int64  `json:"size" gorm:"column:size"`
+	Path     string `json:"path" gorm:"column:path"`
 }
 
 func main() {
@@ -31,6 +41,13 @@ func main() {
 	kafkaTopic := os.Getenv("KAFKA_TOPIC")
 	kafkaURL := os.Getenv("KAFKA_BROKER")
 	outDir := os.Getenv("OUTPUT_DIR")
+	dsn := os.Getenv("POSTGRES_DSN")
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("failed to connect database: %v", err)
+	}
+	db.AutoMigrate(&Video{})
 
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{kafkaURL},
@@ -63,6 +80,17 @@ func main() {
 
 		processVideos(folder, outDir)
 		processSubtitles(folder, outDir)
+
+		video := Video{
+			ID:       messageValue.ID,
+			Event:    messageValue.Event,
+			FileName: messageValue.FileName,
+			Size:     messageValue.Size,
+			Path:     messageValue.Path,
+		}
+		if err := db.Create(&video).Error; err != nil {
+			log.Println("failed to store video:", err)
+		}
 	}
 }
 
