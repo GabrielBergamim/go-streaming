@@ -8,7 +8,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 
-	"github.com/example/go-streaming/api/domain/video"
 	"github.com/example/go-streaming/api/infra/persistence"
 )
 
