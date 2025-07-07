@@ -8,9 +8,9 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
+  storageClassName: hostpath-storage
   hostPath:
-    path: /mnt/videos
+    path: /home/gabriel-bergamim/videos
 
 ---
 
@@ -24,6 +24,6 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
+  storageClassName: hostpath-storage
   hostPath:
-    path: /mnt/videos-processed
+    path: /home/gabriel-bergamim/videos/output

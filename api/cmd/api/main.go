@@ -31,9 +31,9 @@ func main() {
 
 	app.Use(cors.New(cors.Config{AllowOrigins: "*"}))
 
-	app.Static("/videos", "./public/videos")
+	app.Static("/api/video", "./public/videos")
 
-	app.Get("/videos", func(c *fiber.Ctx) error {
+	app.Get("/api/videos", func(c *fiber.Ctx) error {
 		name := c.Query("name")
 		videos, err := repo.FindByName(name)
 		if err != nil {

@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: api
-          image: docker.io/library/go-streaming-api:latest
-          imagePullPolicy: Never
+          image: localhost:32000/go-streaming-api
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           envFrom:

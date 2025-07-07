@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: hostpath-storage
+provisioner: microk8s.io/hostpath
+volumeBindingMode: Immediate
+reclaimPolicy: Retain
+

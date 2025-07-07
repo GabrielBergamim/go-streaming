@@ -9,7 +9,7 @@ spec:
     - name: http
       protocol: HTTP
       port: 80
-      hostname: "hello.local"
+      hostname: "go.streaming"
       allowedRoutes:
         namespaces:
           from: All

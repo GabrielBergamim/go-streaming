@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: processor
-          image: docker.io/library/go-streaming-processor:latest
-          imagePullPolicy: Never
+          image: localhost:32000/go-streaming-processor
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: processor-env

@@ -8,9 +8,9 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
+  storageClassName: hostpath-storage
   hostPath:
-    path: /mnt/postgres
+    path: /home/gabriel-bergamim/postgres
 
 ---
 
@@ -26,4 +26,4 @@ spec:
   resources:
     requests:
       storage: 2Gi
-  storageClassName: ""
+  storageClassName: hostpath-storage 

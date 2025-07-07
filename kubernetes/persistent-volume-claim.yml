@@ -10,7 +10,7 @@ spec:
   resources:
     requests:
       storage: 50Gi
-  storageClassName: ""
+  storageClassName: hostpath-storage
 
 ---
 
@@ -26,5 +26,5 @@ spec:
   resources:
     requests:
       storage: 50Gi
-  storageClassName: ""
+  storageClassName: hostpath-storage
 

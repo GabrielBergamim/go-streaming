@@ -5,4 +5,5 @@ metadata:
   namespace: video-streaming
 data:
   PORT: "8080"
+  POSTGRES_DSN: "host=postgres user=admin password=admin dbname=video-streaming port=5432 sslmode=disable TimeZone=UTC"
 

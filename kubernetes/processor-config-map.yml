@@ -7,4 +7,5 @@ data:
   OUTPUT_DIR: /processed
   KAFKA_TOPIC: process-topic
   KAFKA_BROKER: my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
+  POSTGRES_DSN: "host=postgres user=admin password=admin dbname=video-streaming port=5432 sslmode=disable TimeZone=UTC"
 

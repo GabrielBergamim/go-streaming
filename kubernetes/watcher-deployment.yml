@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: watcher
-          image: docker.io/library/go-streaming-watcher:latest
-          imagePullPolicy: Never
+          image: localhost:32000/go-streaming-watcher
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: watcher-env
