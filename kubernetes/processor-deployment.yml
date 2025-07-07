@@ -17,6 +17,20 @@ spec:
         - name: processor
           image: localhost:32000/go-streaming-processor
           imagePullPolicy: Always
+          resources:
+            requests:
+              # Reserve roughly half a physical core
+              cpu: "2000m"
+              # Reserve 3 GiB of RAM
+              memory: "3Gi"
+              # Ensure at least 5 GiB ephemeral storage for HLS segments
+              ephemeral-storage: "5Gi"
+            limits:
+              # Allow up to ~4 full cores if available
+              cpu: "4000m"
+              # Cap at 6 GiB to avoid starving the OS
+              memory: "6Gi"
+              ephemeral-storage: "10Gi"
           envFrom:
             - configMapRef:
                 name: processor-env
