@@ -24,6 +24,9 @@ func main() {
 	outDir := os.Getenv("OUTPUT_DIR")
 	dsn := os.Getenv("POSTGRES_DSN")
 
+	log.Println("Kafka Topic:", kafkaTopic)
+	log.Println("Kafka Broker:", kafkaURL)
+
 	db, err := persistence.NewDB(dsn)
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)

@@ -94,16 +94,33 @@ func processVideos(folder, outDir string) {
 
 func processSubtitles(folder, outDir string) {
 	exts := []string{"srt"}
+
+    var wg sync.WaitGroup
+
 	for _, ext := range exts {
 		pattern := filepath.Join(folder, "*."+ext)
 		files, _ := filepath.Glob(pattern)
 		for _, f := range files {
-			log.Println("processing subtitle file:", f)
-			out := filepath.Join(outDir, "pt-BR.vtt")
-			cmd := exec.Command("ffmpeg", "-i", f, out)
-			if err := cmd.Run(); err != nil {
-				log.Println("ffmpeg error:", err)
-			}
+            wg.Add(1)
+
+            go func(f string) {
+                defer wg.Done()
+
+				log.Println("processing subtitle file:", f)
+				out := filepath.Join(outDir, "pt-BR.vtt")
+				cmd := exec.Command("ffmpeg", "-i", f, out)
+
+				if err := cmd.Start(); err != nil {
+					log.Println("ffmpeg error:", err)
+					return
+				}
+
+                if err := cmd.Wait(); err != nil {
+                    log.Printf("ffmpeg error on %s: %v", f, err)
+                } else {
+                    log.Printf("finished processing %s", f)
+                }
+			}(f)
 		}
 	}
 }
