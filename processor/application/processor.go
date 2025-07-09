@@ -62,6 +62,8 @@ func processVideos(folder, outDir string) {
                     "ffmpeg",
                     "-nostdin",
                     "-i", f,
+		    "-sn",
+		    "-threads", "6",
                     "-preset", "slow",
                     "-c:v", "libx264",
                     "-crf", "18",

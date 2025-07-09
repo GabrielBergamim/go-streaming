@@ -31,6 +31,11 @@ func main() {
 
 	app.Use(cors.New(cors.Config{AllowOrigins: "*"}))
 
+	app.Use("/api/video", func(c *fiber.Ctx) error {
+	    c.Set("Access-Control-Allow-Origin", "*")
+	    return c.Next()
+	})
+
 	app.Static("/api/video", "./public/videos")
 
 	app.Get("/api/videos", func(c *fiber.Ctx) error {

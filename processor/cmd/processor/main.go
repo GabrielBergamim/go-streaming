@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/segmentio/kafka-go"
@@ -47,7 +48,9 @@ func main() {
 	for {
 		m, err := r.ReadMessage(context.Background())
 		if err != nil {
-			log.Fatal(err)
+			log.Println("Failed to connect")
+			time.Sleep(5 * time.Second)
+			continue
 		}
 
 		var msg message.Event

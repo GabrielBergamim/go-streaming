@@ -22,15 +22,15 @@ spec:
               # Reserve roughly half a physical core
               cpu: "2000m"
               # Reserve 3 GiB of RAM
-              memory: "3Gi"
+              memory: "4Gi"
               # Ensure at least 5 GiB ephemeral storage for HLS segments
-              ephemeral-storage: "5Gi"
+              ephemeral-storage: "15Gi"
             limits:
               # Allow up to ~4 full cores if available
               cpu: "4000m"
               # Cap at 6 GiB to avoid starving the OS
-              memory: "6Gi"
-              ephemeral-storage: "10Gi"
+              memory: "8Gi"
+              ephemeral-storage: "20Gi"
           envFrom:
             - configMapRef:
                 name: processor-env
