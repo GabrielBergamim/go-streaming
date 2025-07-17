@@ -1,4 +1,3 @@
-
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -17,5 +16,12 @@ spec:
             value: /api
       backendRefs:
         - name: api-service
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /ui
+      backendRefs:
+        - name: ui-service
           port: 8080
 
