@@ -1,12 +1,11 @@
 package producer
 
 import (
-	"errors"
 	"log"
 	"os"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/google/uuid"
+	"github.com/radovskyb/watcher"
 )
 
 type Producer struct {
@@ -25,19 +24,13 @@ type MessageEvent struct {
 	Path     string `json:"path"`
 }
 
-func (p *Producer) SendEvent(event fsnotify.Event) error {
-	filename := event.Name
+func (p *Producer) SendEvent(event watcher.Event) error {
+	filename := event.Path
 	log.Println("Processing file:", filename)
-
-	if event.Op&fsnotify.Create == fsnotify.Create {
-		return p.send(filename)
-	}
-
-	log.Println("Event not handled:", event.Op)
-	return errors.New("Event not handled")
+	return p.send(filename)
 }
 
-func (p *Producer) send(filename string)  error {
+func (p *Producer) send(filename string) error {
 	file, err := os.Open(filename)
 
 	if err != nil {
@@ -72,4 +65,3 @@ func (p *Producer) send(filename string)  error {
 func generateUUID() string {
 	return uuid.New().String()
 }
-

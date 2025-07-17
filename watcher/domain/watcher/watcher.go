@@ -2,9 +2,10 @@ package watcher
 
 import (
 	"log"
+	"time"
 
 	"github.com/example/go-streaming/watcher/domain/producer"
-	"github.com/fsnotify/fsnotify"
+	"github.com/radovskyb/watcher"
 )
 
 type Watcher struct {
@@ -12,44 +13,37 @@ type Watcher struct {
 }
 
 func (w *Watcher) Start(producer *producer.Producer) error {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		log.Fatal(err)
+	watch := watcher.New()
+	watch.SetMaxEvents(1)
+	watch.FilterOps(watcher.Create)
+
+	if err := watch.Add(w.FolderPath); err != nil {
+		log.Println("Error adding folder to watcher:", err)
+		return err
 	}
 
-	defer watcher.Close()
-
-	done := make(chan struct{})
-
 	go func() {
-		log.Println("Starting file watcher on:", w.FolderPath)
 		for {
 			select {
-			case event, ok := <-watcher.Events:
-				if !ok {
-					log.Println("Watcher channel closed")
-					return
+			case event := <-watch.Event:
+				log.Println("Detected:", event) // Create, Remove, etc.
+				if err := producer.SendEvent(event); err != nil {
+				log.Println("Error sending event:", err)
+					continue
 				}
-
-				log.Println("Event:", event)
-				producer.SendEvent(event)
-			case err, ok := <-watcher.Errors:
-				if !ok {
-					return
-				}
-				log.Println("error:", err)
+			case err := <-watch.Error:
+				log.Println("Error:", err)
+			case <-watch.Closed:
+				log.Println("Watcher closed")
+				return
 			}
 		}
 	}()
 
-	err = watcher.Add(w.FolderPath)
-	if err != nil {
-		log.Println("Error adding folder to watcher:", err)
-		log.Fatal(err)
-		return err
+	if err := watch.Start(time.Second * 10); err != nil {
+		log.Println("Error starting watcher:", err)
+		return err;
 	}
-	<-done
 
 	return nil
 }
-
