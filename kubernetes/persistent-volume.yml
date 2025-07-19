@@ -1,16 +1,27 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: Immediate
+
+---
+
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-videos
 spec:
   capacity:
-    storage: 50Gi
+    storage: 500Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: hostpath-storage
-  hostPath:
-    path: /home/gabriel-bergamim/videos
+  storageClassName: nfs-storage
+  nfs:
+    server: 192.168.0.113     # your laptop IP
+    path: /mnt/hls-storage/videos
+    readOnly: false
 
 ---
 
@@ -20,10 +31,12 @@ metadata:
   name: pv-videos-processed
 spec:
   capacity:
-    storage: 50Gi
+    storage: 500Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: hostpath-storage
-  hostPath:
-    path: /home/gabriel-bergamim/videos/output
+  storageClassName: nfs-storage
+  nfs:
+    server: 192.168.0.113     # your laptop IP
+    path: /mnt/hls-storage/output
+    readOnly: false

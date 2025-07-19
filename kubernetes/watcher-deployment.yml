@@ -13,6 +13,9 @@ spec:
       labels:
         app: watcher
     spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: watcher
           image: localhost:32000/go-streaming-watcher
