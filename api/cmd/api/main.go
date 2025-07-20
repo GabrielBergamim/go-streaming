@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"mime"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -27,14 +28,11 @@ func main() {
 
 	repo := persistence.NewGormVideoRepository(db)
 
+	mime.AddExtensionType(".ts", "video/mp2t")
+
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{AllowOrigins: "*"}))
-
-	app.Use("/api/video", func(c *fiber.Ctx) error {
-	    c.Set("Access-Control-Allow-Origin", "*")
-	    return c.Next()
-	})
 
 	app.Static("/api/video", "./public/videos", fiber.Static{
 		Compress: false, ByteRange: true,})
