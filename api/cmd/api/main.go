@@ -36,7 +36,8 @@ func main() {
 	    return c.Next()
 	})
 
-	app.Static("/api/video", "./public/videos")
+	app.Static("/api/video", "./public/videos", fiber.Static{
+		Compress: false, ByteRange: true,})
 
 	app.Get("/api/videos", func(c *fiber.Ctx) error {
 		name := c.Query("name")
