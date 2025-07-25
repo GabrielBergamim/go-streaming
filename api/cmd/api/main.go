@@ -28,11 +28,17 @@ func main() {
 
 	repo := persistence.NewGormVideoRepository(db)
 
-	mime.AddExtensionType(".ts", "video/mp2t")
+	mime.AddExtensionType(".m4s", "video/iso.segment")
+	mime.AddExtensionType(".m3u8", "application/x-mpegURL")
 
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{AllowOrigins: "*"}))
+
+	app.Use("/api/video", func(c *fiber.Ctx) error {
+		c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		return c.Next()
+	})
 
 	app.Static("/api/video", "./public/videos", fiber.Static{
 		Compress: false, ByteRange: true,})
