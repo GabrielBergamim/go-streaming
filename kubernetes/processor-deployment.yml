@@ -15,21 +15,20 @@ spec:
     spec:
       containers:
         - name: processor
-          image: localhost:32000/go-streaming-processor
-          imagePullPolicy: Always
+          image: go-streaming-processor:1.3
+          imagePullPolicy: IfNotPresent
           resources:
             requests:
-              # Reserve roughly half a physical core
-              cpu: "2000m"
+              cpu: "19000m"
               # Reserve 3 GiB of RAM
-              memory: "4Gi"
+              memory: "14Gi"
               # Ensure at least 5 GiB ephemeral storage for HLS segments
               ephemeral-storage: "15Gi"
             limits:
               # Allow up to ~4 full cores if available
-              cpu: "4000m"
+              cpu: "20000m"
               # Cap at 6 GiB to avoid starving the OS
-              memory: "8Gi"
+              memory: "16Gi"
               ephemeral-storage: "20Gi"
           envFrom:
             - configMapRef:

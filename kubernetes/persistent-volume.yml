@@ -19,7 +19,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: nfs-storage
   nfs:
-    server: 192.168.0.113     # your laptop IP
+    server: 192.168.0.111     # your laptop IP
     path: /mnt/hls-storage/videos
     readOnly: false
 
@@ -37,6 +37,6 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: nfs-storage
   nfs:
-    server: 192.168.0.113     # your laptop IP
+    server: 192.168.0.111     # your laptop IP
     path: /mnt/hls-storage/output
     readOnly: false
