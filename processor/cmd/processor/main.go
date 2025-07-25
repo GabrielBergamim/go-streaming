@@ -59,6 +59,8 @@ func main() {
 			continue
 		}
 
+		log.Printf("Received message: ID=%s, Event=%s, FileName=%s, Size=%d, Path=%s\n",
+			msg.ID, msg.Event, msg.FileName, msg.Size, msg.Path)
 		processor.HandleEvent(&msg, outDir)
 	}
 }

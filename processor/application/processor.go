@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"log"
 	"os"
 	"os/exec"
@@ -17,13 +18,36 @@ type Processor struct {
 }
 
 func (p *Processor) HandleEvent(msg *message.Event, outDir string) {
-	folder := msg.Path
+	folder := filepath.Join(os.Getenv("WATCH_DIR"), msg.FileName)
 	outDir = filepath.Join(outDir, msg.ID)
+
+	log.Println("input folder:", folder)
+	log.Println("output directory:", outDir)
+
 	os.MkdirAll(outDir, os.ModePerm)
 
-	processVideos(folder, outDir)
-	processSubtitles(folder, outDir)
+	var wg sync.WaitGroup
+	var errs = make(chan error, 2)
 
+	processVideos(&wg, &errs, folder, outDir)
+	processSubtitles(&wg, &errs, folder, outDir)
+
+	go func() {
+		wg.Wait()
+		log.Println("All processing done for event:", msg.ID)
+
+		close(errs)
+
+		if len(errs) > 0 {
+			os.RemoveAll(outDir)
+			return
+		}
+
+		p.saveVideo(msg)
+	}()
+}
+
+func (p *Processor) saveVideo(msg *message.Event) {
 	v := video.Video{
 		ID:       msg.ID,
 		Event:    msg.Event,
@@ -31,98 +55,141 @@ func (p *Processor) HandleEvent(msg *message.Event, outDir string) {
 		Size:     msg.Size,
 		Path:     msg.Path,
 	}
+
 	if err := p.Repo.Save(&v); err != nil {
 		log.Println("failed to store video:", err)
 	}
 }
 
-func processVideos(folder, outDir string) {
-    exts := []string{"mkv", "mp4", "avi"}
+func processVideos(wg *sync.WaitGroup, errs *chan error, folder string, outDir string) {
+	exts := []string{"mkv", "mp4", "avi"}
+	wg.Add(1)
+	f, err := findFileWithExt(folder, exts)
 
-    var wg sync.WaitGroup
+	if err != nil {
+		log.Println("No video files found:", err)
+		*errs <- err
+		wg.Done()
+		return
+	}
 
-    for _, ext := range exts {
-        pattern := filepath.Join(folder, "*."+ext)
-        files, err := filepath.Glob(pattern)
-        if err != nil {
-            log.Printf("glob error for %s: %v", pattern, err)
-            continue
-        }
+	log.Println("Found video file:", f)
 
-        for _, f := range files {
-            wg.Add(1)
+	go func(f string) {
+		defer wg.Done()
 
-            go func(f string) {
-                defer wg.Done()
+		log.Println("processing video file:", f)
 
-                log.Println("processing video file:", f)
-                out := filepath.Join(outDir, "video")
+		cmd := cmdProcessVideo(f, outDir)
 
-                cmd := exec.Command(
-                    "ffmpeg",
-                    "-nostdin",
-                    "-i", f,
-		    "-sn",
-		    "-threads", "6",
-                    "-preset", "slow",
-                    "-c:v", "libx264",
-                    "-crf", "18",
-                    "-hls_time", "10",
-                    "-hls_list_size", "0",
-                    "-hls_segment_filename", filepath.Join(outDir, "video_segment_%03d.ts"),
-                    out+".m3u8",
-                )
+		if err := cmd.Start(); err != nil {
+			log.Printf("failed to start ffmpeg on %s: %v", f, err)
+			return
+		}
 
-                // Pipe stdout/stderr if you want logs in your container logs
-                cmd.Stdout = os.Stdout
-                cmd.Stderr = os.Stderr
-
-                // Start the process
-                if err := cmd.Start(); err != nil {
-                    log.Printf("failed to start ffmpeg on %s: %v", f, err)
-                    return
-                }
-
-                // Wait for it to finish
-                if err := cmd.Wait(); err != nil {
-                    log.Printf("ffmpeg error on %s: %v", f, err)
-                } else {
-                    log.Printf("finished processing %s", f)
-                }
-            }(f)
-        }
-    }
+		if err := cmd.Wait(); err != nil {
+			log.Printf("ffmpeg error on %s: %v", f, err)
+		} else {
+			log.Printf("finished processing %s", f)
+		}
+	}(f)
 }
 
-func processSubtitles(folder, outDir string) {
-	exts := []string{"srt"}
+func cmdProcessVideo(f string, outDir string) *exec.Cmd {
+	segmentPath := filepath.Join(outDir, "video_segment_%03d.m4s")
+	playListPath := filepath.Join(outDir, "video.m3u8")
 
-    var wg sync.WaitGroup
+	cmd := exec.Command(
+		"ffmpeg",
+		"-hide_banner",
+		"-nostdin",
+		"-sn",
+		"-hwaccel", "cuda",
+		"-hwaccel_output_format", "cuda",
+		"-i", f,
+		"-vf", "scale_cuda=iw:ih:format=nv12",
+		"-map", "0:v",
+		"-map", "0:a",
+		"-c:v", "h264_nvenc",
+		"-preset", "p7",
+		"-rc", "constqp",
+		"-qp", "18",
+		"-tag:v", "avc1",
+		"-c:a", "aac",
+		"-b:a", "256k",
+		"-f", "hls",
+		"-hls_time", "6",
+		"-hls_playlist_type", "vod",
+		"-hls_segment_type", "fmp4",
+		"-hls_flags", "independent_segments",
+		"-hls_fmp4_init_filename", "init.mp4",
+		"-hls_segment_filename", segmentPath,
+		playListPath,
+	)
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
+}
+
+func findFileWithExt(folder string, exts []string) (string, error) {
+	if len(exts) == 0 {
+		return "", errors.New("No extensions provided")
+	}
+
+	log.Println("Searching for files in folder:", folder)
 
 	for _, ext := range exts {
 		pattern := filepath.Join(folder, "*."+ext)
-		files, _ := filepath.Glob(pattern)
-		for _, f := range files {
-            wg.Add(1)
+		files, err := filepath.Glob(pattern)
 
-            go func(f string) {
-                defer wg.Done()
+		log.Printf("Searching for files with pattern: %s", pattern)
 
-				log.Println("processing subtitle file:", f)
-				out := filepath.Join(outDir, "pt-BR.vtt")
-				cmd := exec.Command("ffmpeg", "-i", f, out)
+		if err != nil {
+			log.Printf("glob error for %s: %v", pattern, err)
+			continue
+		}
 
-				if err := cmd.Start(); err != nil {
-					log.Println("ffmpeg error:", err)
-					return
-				}
+		log.Printf("Found files with %s extension: %v", ext, files)
 
-                if err := cmd.Wait(); err != nil {
-                    log.Printf("ffmpeg error on %s: %v", f, err)
-                } else {
-                    log.Printf("finished processing %s", f)
-                }
-			}(f)
+		if len(files) > 0 {
+			return files[0], nil
 		}
 	}
+
+	return "", errors.New("No files found with specified extensions")
+}
+
+func processSubtitles(wg *sync.WaitGroup, errs *chan error, folder string, outDir string) {
+	exts := []string{"srt"}
+	f, err := findFileWithExt(folder, exts)
+
+	wg.Add(1)
+
+	if err != nil {
+		log.Println("No subtitle files found:", err)
+		*errs <- err
+		wg.Done()
+		return
+	}
+
+	go func(f string) {
+		defer wg.Done()
+
+		log.Println("processing subtitle file:", f)
+		out := filepath.Join(outDir, "pt-BR.vtt")
+		cmd := exec.Command("ffmpeg", "-i", f, out)
+
+		if err := cmd.Start(); err != nil {
+			log.Println("ffmpeg error:", err)
+			return
+		}
+
+		if err := cmd.Wait(); err != nil {
+			log.Printf("ffmpeg error on %s: %v", f, err)
+		} else {
+			log.Printf("finished processing %s", f)
+		}
+	}(f)
 }
