@@ -1,18 +1,32 @@
 package persistence
 
 import (
-	"github.com/example/go-streaming/api/domain/video"
+	"log"
+	"os"
+	"time"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-func NewDB(dsn string) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func NewDB(dsn string) *gorm.DB {
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io.Writer
+		logger.Config{
+			SlowThreshold:             200 * time.Millisecond, // log slow queries
+			LogLevel:                  logger.Info,            // Info shows SQL
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+			// Set to true to HIDE values (only placeholders) – leave false to see bound params
+			ParameterizedQueries: false,
+		},
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger})
 	if err != nil {
-		return nil, err
+		panic("failed to connect database")
 	}
-	if err := db.AutoMigrate(&video.Video{}); err != nil {
-		return nil, err
-	}
-	return db, nil
+
+	return db
 }

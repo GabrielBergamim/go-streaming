@@ -1,5 +1,5 @@
 package video
 
-type Repository interface {
-	FindByName(name string) ([]Video, error)
+type VideoRepository interface {
+	Paginate(page int, size int, filter VideoFilter) (Page[Video], error)
 }
