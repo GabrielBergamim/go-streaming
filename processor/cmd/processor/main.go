@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"github.com/example/go-streaming/processor/application"
 	"github.com/example/go-streaming/processor/domain/message"
 	"github.com/example/go-streaming/processor/infra/persistence"
+	producer_impl "github.com/example/go-streaming/processor/infra/producer"
 )
 
 func main() {
@@ -34,7 +36,16 @@ func main() {
 	}
 
 	repo := persistence.NewGormVideoRepository(db)
-	processor := application.Processor{Repo: repo}
+
+	kafkaWriter, err := getKafkaInstance()
+
+	if err != nil {
+		log.Fatalf("failed to create kafka instance: %v", err)
+	}
+
+	infoProducer := producer_impl.NewInfoProducerImpl(kafkaWriter)
+
+	processor := application.Processor{Repo: repo, InfoProducer: infoProducer}
 
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{kafkaURL},
@@ -63,4 +74,21 @@ func main() {
 			msg.ID, msg.Event, msg.FileName, msg.Size, msg.Path)
 		processor.HandleEvent(&msg, outDir)
 	}
+}
+
+func getKafkaInstance() (*kafka.Writer, error) {
+	kafkaTopic := os.Getenv("KAFKA_TOPIC")
+	kafkaURL := os.Getenv("KAFKA_BROKER")
+
+	if kafkaTopic == "" || kafkaURL == "" {
+		return nil, errors.New("Kafka topic or broker URL not set")
+	}
+
+	writer := kafka.NewWriter(kafka.WriterConfig{
+		Brokers: []string{kafkaURL},
+		Topic:   kafkaTopic,
+		Balancer: &kafka.LeastBytes{},
+	})
+
+	return writer, nil
 }

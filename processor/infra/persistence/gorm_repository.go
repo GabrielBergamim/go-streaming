@@ -1,8 +1,8 @@
 package persistence
 
 import (
+	"github.com/example/go-streaming/processor/domain/movie"
 	"github.com/example/go-streaming/processor/domain/repository"
-	"github.com/example/go-streaming/processor/domain/video"
 	"gorm.io/gorm"
 )
 
@@ -14,8 +14,8 @@ func NewGormVideoRepository(db *gorm.DB) *GormVideoRepository {
 	return &GormVideoRepository{DB: db}
 }
 
-func (r *GormVideoRepository) Save(v *video.Video) error {
+func (r *GormVideoRepository) Save(v *movie.Movie) error {
 	return r.DB.Create(v).Error
 }
 
-var _ repository.VideoRepository = (*GormVideoRepository)(nil)
+var _ repository.MovieRepository = (*GormVideoRepository)(nil)

@@ -1,7 +1,7 @@
 package persistence
 
 import (
-	"github.com/example/go-streaming/processor/domain/video"
+	"github.com/example/go-streaming/processor/domain/movie"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -11,7 +11,7 @@ func NewDB(dsn string) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := db.AutoMigrate(&video.Video{}); err != nil {
+	if err := db.AutoMigrate(&movie.Movie{}); err != nil {
 		return nil, err
 	}
 	return db, nil

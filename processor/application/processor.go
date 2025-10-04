@@ -9,12 +9,15 @@ import (
 	"sync"
 
 	"github.com/example/go-streaming/processor/domain/message"
+	"github.com/example/go-streaming/processor/domain/movie"
+	"github.com/example/go-streaming/processor/domain/producer"
 	"github.com/example/go-streaming/processor/domain/repository"
-	"github.com/example/go-streaming/processor/domain/video"
+	"github.com/google/uuid"
 )
 
 type Processor struct {
-	Repo repository.VideoRepository
+	Repo repository.MovieRepository
+	InfoProducer producer.InfoProducer
 }
 
 func (p *Processor) HandleEvent(msg *message.Event, outDir string) {
@@ -48,11 +51,10 @@ func (p *Processor) HandleEvent(msg *message.Event, outDir string) {
 }
 
 func (p *Processor) saveVideo(msg *message.Event) {
-	v := video.Video{
-		ID:       msg.ID,
-		Event:    msg.Event,
-		FileName: msg.FileName,
-		Size:     msg.Size,
+	var uuid, _ = uuid.Parse(msg.ID)
+	v := movie.Movie{
+		ID:       uuid,
+		Title:    msg.FileName,
 		Path:     msg.Path,
 	}
 
