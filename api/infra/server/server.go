@@ -28,7 +28,7 @@ func NewServer(port string, dsn string) *Server {
 func (s *Server) Start() error {
 	s.setRoutes()
 
-	mime.AddExtensionType(".m4s", "video/iso.segment")
+	mime.AddExtensionType(".m4s", "movie/iso.segment")
 	mime.AddExtensionType(".m3u8", "application/x-mpegURL")
 
 	if err := s.app.Listen(s.Port); err != nil {
@@ -40,7 +40,7 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) setRoutes() {
-	videoRepository := persistence.NewGormVideoRepository(s.db)
-	router := router.NewRouter(s.app, controller.NewVideosController(videoRepository))
+	movieRepository := persistence.NewGormMovieRepository(s.db)
+	router := router.NewRouter(s.app, controller.NewMoviesController(movieRepository))
 	router.SetUp()
 }

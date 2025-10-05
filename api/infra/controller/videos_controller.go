@@ -3,21 +3,21 @@ package controller
 import (
 	"strconv"
 
-	"github.com/example/go-streaming/api/domain/video"
+	"github.com/example/go-streaming/api/domain/movie"
 	"github.com/gofiber/fiber/v2"
 )
 
-type VideosController struct {
-    VideoRepository video.VideoRepository
+type MoviesController struct {
+    MovieRepository movie.MovieRepository
 }
 
-func NewVideosController(videoRepository video.VideoRepository) *VideosController {
-	return &VideosController{
-		VideoRepository: videoRepository,
+func NewMoviesController(movieRepository movie.MovieRepository) *MoviesController {
+	return &MoviesController{
+		MovieRepository: movieRepository,
 	}
 }
 
-func (vc *VideosController) GetVideos(c *fiber.Ctx) error {
+func (vc *MoviesController) GetMovies(c *fiber.Ctx) error {
 	name := c.Query("name")
 	page, err := strconv.Atoi(c.Query("page", "1"))
 
@@ -35,14 +35,21 @@ func (vc *VideosController) GetVideos(c *fiber.Ctx) error {
 		})
 	}
 
-	pageable, err := vc.VideoRepository.Paginate(page,
-		size, video.VideoFilter{Name: name})
+	pageable, err := vc.MovieRepository.Paginate(page,
+		size, movie.MovieFilter{Name: name})
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to fetch videos",
+			"error": "Failed to fetch movies",
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(pageable)
+	pageableResponse := movie.Page[movie.MovieDTO] {
+		Content:    movie.ToMovieDTOs(pageable.Content),
+		TotalItems: pageable.TotalItems,
+		TotalPages: pageable.TotalPages,
+		IsLast:     pageable.IsLast,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(pageableResponse)
 }

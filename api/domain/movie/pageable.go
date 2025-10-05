@@ -1,4 +1,4 @@
-package video
+package movie
 
 type Page[T any] struct {
 	TotalItems  int64 `json:"totalItems"`
