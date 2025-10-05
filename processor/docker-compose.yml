@@ -1,0 +1,14 @@
+services:
+
+  processor:
+    build: ./processor
+    container_name: processor
+    env_file:
+      - /home/gabrielbergamim/projects/go/go-streaming/.env
+    volumes:
+      - /mnt/hls-storage/videos:/videos
+      - /mnt/hls-storage/output:/processed
+
+volumes:
+  postgres_data:
+    driver: local

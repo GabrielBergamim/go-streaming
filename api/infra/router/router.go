@@ -5,31 +5,33 @@ import (
 
 	"github.com/example/go-streaming/api/infra/controller"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 type Router struct {
 	app              *fiber.App
-	videosController *controller.VideosController
+	moviesController *controller.MoviesController
 }
 
-func NewRouter(app *fiber.App, videosController *controller.VideosController) *Router {
+func NewRouter(app *fiber.App, moviesController *controller.MoviesController) *Router {
 	return &Router{
 		app:              app,
-		videosController: videosController,
+		moviesController: moviesController,
 	}
 }
 
 func (r *Router) SetUp() {
+	r.app.Use(cors.New())
 	r.staticFiles()
-	r.videosRoutes()
+	r.moviesRoutes()
 }
 
-func (r *Router) videosRoutes() {
-	group := r.app.Group("/api/videos")
-	group.Get("/", r.videosController.GetVideos)
+func (r *Router) moviesRoutes() {
+	group := r.app.Group("/api/movies")
+	group.Get("/", r.moviesController.GetMovies)
 }
 
 func (r *Router) staticFiles() {
 	fiberStatic := fiber.Static{Compress: false, ByteRange: true}
-	r.app.Static("/api/video", os.Getenv("PUBLIC_FILES"), fiberStatic)
+	r.app.Static("/api/movie", os.Getenv("PUBLIC_FILES"), fiberStatic)
 }
