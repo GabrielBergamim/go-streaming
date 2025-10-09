@@ -29,6 +29,7 @@ func (r *Router) SetUp() {
 func (r *Router) moviesRoutes() {
 	group := r.app.Group("/api/movies")
 	group.Get("/", r.moviesController.GetMovies)
+	group.Get("/:id", r.moviesController.GetMovie)
 }
 
 func (r *Router) staticFiles() {

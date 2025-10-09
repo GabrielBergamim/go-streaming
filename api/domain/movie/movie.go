@@ -45,32 +45,36 @@ func ToMovieDTOs(movies []Movie) []MovieDTO {
 	dtos := make([]MovieDTO, len(movies))
 
 	for i, m := range movies {
-		var durationStr *string
-		if m.Duration != nil && m.Duration.Valid {
-			d := IntervalToHHMMSS(*m.Duration)
-			durationStr = &d
-		}
-
-		var releaseDateStr *string
-		if m.ReleaseDate != nil {
-			d := m.ReleaseDate.Format("2006-01-02")
-			releaseDateStr = &d
-		}
-
-		dtos[i] = MovieDTO{
-			ID:          m.ID,
-			Title:       m.Title,
-			Description: m.Description,
-			Genre:       m.Genre,
-			Director:    m.Director,
-			PosterURL:   m.PosterURL,
-			Rating:      m.Rating,
-			Duration:    durationStr,
-			ReleaseDate: releaseDateStr,
-		}
+		dtos[i] = ToMovieDTO(m)
 	}
 
 	return dtos
+}
+
+func ToMovieDTO (m Movie) MovieDTO {
+	var durationStr *string
+	if m.Duration != nil && m.Duration.Valid {
+		d := IntervalToHHMMSS(*m.Duration)
+		durationStr = &d
+	}
+
+	var releaseDateStr *string
+	if m.ReleaseDate != nil {
+		d := m.ReleaseDate.Format("2006-01-02")
+		releaseDateStr = &d
+	}
+
+	return MovieDTO{
+		ID:          m.ID,
+		Title:       m.Title,
+		Description: m.Description,
+		Genre:       m.Genre,
+		Director:    m.Director,
+		PosterURL:   m.PosterURL,
+		Rating:      m.Rating,
+		Duration:    durationStr,
+		ReleaseDate: releaseDateStr,
+	}
 }
 
 func IntervalToHHMMSS(iv pgtype.Interval) string {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/example/go-streaming/api/domain/movie"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type MoviesController struct {
@@ -15,6 +16,27 @@ func NewMoviesController(movieRepository movie.MovieRepository) *MoviesControlle
 	return &MoviesController{
 		MovieRepository: movieRepository,
 	}
+}
+
+func (vc *MoviesController) GetMovie(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid movie ID",
+		})
+	}
+
+	movieEntity, err := vc.MovieRepository.FindByID(id)
+
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Movie not found",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(movie.ToMovieDTO(*movieEntity))
+
 }
 
 func (vc *MoviesController) GetMovies(c *fiber.Ctx) error {

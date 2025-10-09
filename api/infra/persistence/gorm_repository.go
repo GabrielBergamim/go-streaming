@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"github.com/example/go-streaming/api/domain/movie"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -45,4 +46,15 @@ func (r *GormMovieRepository) paginateScope(page int, size int) func(db *gorm.DB
 		offset := (page - 1) * size
 		return db.Offset(offset).Limit(size)
 	}
+}
+
+func (r *GormMovieRepository) FindByID(id uuid.UUID) (*movie.Movie, error) {
+	var m movie.Movie
+	if err := r.DB.First(&m, "id = ?", id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &m, nil
 }
